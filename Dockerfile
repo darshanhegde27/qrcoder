@@ -1,6 +1,7 @@
 # Dockerfile
-FROM node:18-slim
+FROM node:latest
 
+RUN npm install -g pm2
 # Install canvas dependencies
 RUN apt-get update && \
     apt-get install -y \
