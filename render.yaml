@@ -1,0 +1,16 @@
+# render.yaml
+services:
+  - type: web
+    name: qr-barcode-api-pm2
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: pm2-runtime start ecosystem.config.js --env production
+    env: node
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+    healthCheckPath: /api
+    plan: free
+    autoDeploy: true
