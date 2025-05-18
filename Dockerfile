@@ -1,23 +1,23 @@
 # Dockerfile
-FROM node:18-alpine
+FROM node:18-slim
+
+# Install canvas dependencies
+RUN apt-get update && \
+    apt-get install -y \
+    build-essential \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev
 
 WORKDIR /app
 
-# Install PM2 globally
-RUN npm install pm2 -g
-
-# Install app dependencies
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install
 
-# Bundle app source
 COPY . .
-
-# Build the app
 RUN npm run build
 
-# Expose the app port
 EXPOSE 3000
-
-# Run the app with PM2
-CMD ["pm2-runtime", "start", "ecosystem.config.js", "--env", "production"]
+CMD ["npm", "run", "start:prod"]
