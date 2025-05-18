@@ -5,23 +5,57 @@ import { createCanvas } from 'canvas';
 
 @Injectable()
 export class GeneratorService {
-  async generateQRCode(text: string, options: any = {}): Promise<string> {
+  /**
+   * Generates QR code as PNG buffer
+   * @param text Text to encode
+   * @param options QR code options
+   * @returns PNG image buffer
+   */
+  async generateQRCode(text: string, options: any = {}): Promise<Buffer> {
     const defaultOptions = {
-      errorCorrectionLevel: 'H',
+      errorCorrectionLevel: 'H', // Highest error correction
       margin: 1,
-      scale: 8,
+      width: 300, // Default width
       ...options
     };
-    return QRCode.toDataURL(text, defaultOptions);
+
+    return new Promise((resolve, reject) => {
+      QRCode.toBuffer(
+        text,
+        {
+          type: 'png',
+          ...defaultOptions
+        },
+        (err, buffer) => {
+          if (err) reject(err);
+          else resolve(buffer);
+        }
+      );
+    });
   }
 
-  async generateBarcode(text: string, type: string, options: any = {}): Promise<string> {
-    const canvas = createCanvas(300, 150);
-    JsBarcode(canvas, text, { 
-      format: type,
+  /**
+   * Generates barcode as PNG buffer
+   * @param text Text to encode
+   * @param type Barcode type
+   * @param options Barcode options
+   * @returns PNG image buffer
+   */
+  async generateBarcode(text: string, type: string, options: any = {}): Promise<Buffer> {
+    const defaultOptions = {
+      width: 2,
+      height: 100,
       displayValue: true,
+      margin: 10,
       ...options
+    };
+
+    const canvas = createCanvas(300, 150);
+    JsBarcode(canvas, text, {
+      format: type,
+      ...defaultOptions
     });
-    return canvas.toDataURL('image/png');
+
+    return canvas.toBuffer('image/png');
   }
 }
